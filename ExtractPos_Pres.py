@@ -109,8 +109,7 @@ def plot_dataset(file_num,pos,force):
                 np.array(y_pres[i].append(abs(j-pos[i][0][1])))
             count += 1
         z_force[i] = force[i]
-    print(y_pres[0])
-    print(z_force[0])
+
     # ax = plt.subplot(111,projection='3d')
 
     # for index in range(5):
