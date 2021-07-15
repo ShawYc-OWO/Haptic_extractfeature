@@ -14,6 +14,7 @@ all_list_force = []
 y_pres = []
 z_force = []
 gra = 9.81 # convert kg to N
+y_pos = []
 
 def cal_size(pressure_array):
     return len(pressure_array)
@@ -90,25 +91,42 @@ def indexofMin(tmp_array):
         currentindex += 1
     return minindex
 
-
-def plot_dataset(file_num,pos,force):
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    X = np.arange(0,file_num, 1)
-
+def modif(file_num,pos,force):
     for i in range(file_num):
-        y_pres.append([])
+        y_pos.append([])
         z_force.append([])
 
     for i in range(file_num):
         count = 0
         # minindex = indexofMin(pos[i][:,1])
         # for j in pos[i][:(minindex+1),1]:
-        for j in pos[i][:,1]:
+        for j in pos[i][:, 1]:
             if count >= 1:
-                np.array(y_pres[i].append(abs(j-pos[i][0][1])))
+                np.array(y_pos[i].append(abs(j - pos[i][0][1])))
             count += 1
         z_force[i] = force[i]
+    # print(len(y_pos[0]))
+    # print(len(z_force[0]))
+    return y_pos, z_force
+
+def plot_dataset(file_num,pos,force):
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    X = np.arange(0,file_num, 1)
+
+    # for i in range(file_num):
+    #     y_pres.append([])
+    #     z_force.append([])
+    #
+    # for i in range(file_num):
+    #     count = 0
+    #     # minindex = indexofMin(pos[i][:,1])
+    #     # for j in pos[i][:(minindex+1),1]:
+    #     for j in pos[i][:,1]:
+    #         if count >= 1:
+    #             np.array(y_pres[i].append(abs(j-pos[i][0][1])))
+    #         count += 1
+    #     z_force[i] = force[i]
 
     # ax = plt.subplot(111,projection='3d')
 
@@ -116,7 +134,7 @@ def plot_dataset(file_num,pos,force):
     #     ax.scatter(X[index], y_pres[index], z_force[index])  # 绘制数据点
     ax = plt.subplot(111)
     for index in range(5):
-        ax.scatter(y_pres[index], z_force[index],cmap='rainbow')  # 绘制数据点
+        ax.scatter(pos[index], force[index],cmap='rainbow')  # 绘制数据点
         ax.set_ylabel('force')
         ax.set_xlabel('depth')
 
@@ -135,9 +153,9 @@ def plot_dataset(file_num,pos,force):
 if __name__ =='__main__':
     pos = read_pos()
     pres_list,file_num = read_pres()
-
     com_force = comp_force(pres_list,file_num)
-    plot_dataset(file_num,pos,com_force)
+    pos,force = modif(file_num,pos,com_force)
+    plot_dataset(file_num,pos,force)
 
     # pos = pd.read_excel(
     #     io=r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format\testtest_N0 14-06-2021 13-30.xlsx',
