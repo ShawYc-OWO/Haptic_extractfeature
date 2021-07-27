@@ -10,15 +10,15 @@ class RBF:
         self.input_dim = input_dim
         self.num_neuron = num_neuron
         self.out_dim = out_dim
-        self.lamda = 8 # RBF的扩展常数，乘在欧式距离范数前的系数
-        self.centres = [np.random.uniform(-1,1,input_dim) for i in range(num_neuron)]
+        self.lamda = 0.32 # RBF的扩展常数，乘在欧式距离范数前的系数
+        self.centres = [np.random.uniform(-0.25,0.25,input_dim) for i in range(num_neuron)]
         self.W = np.random.random((num_neuron,out_dim))
 
     def _basicFunc(self,c,x):
         return np.exp(-self.lamda * norm(c-x)**2)
 
     def _calAct(self,X):
-        print(X.shape[0])
+        # print(X.shape[0])
         G = np.zeros((X.shape[0],self.num_neuron),dtype='float')
         for c_idx ,c in enumerate(self.centres):
             for x_idx, x in enumerate(X):
@@ -51,23 +51,22 @@ if __name__ == '__main__':
     x_pos,y_force = ext.modif(file_num,x_pos,com_force)
 
     # for i in range(np.array(x_pos,dtype='object').shape[0][:15]):
-    rbf = RBF(1,60,1)
-    for i in range(24):
-        print('flag')
+    rbf = RBF(1,39,1)
+    for i in range(29):
         # for j, x_val in enumerate(x_pos[i]):
         #     print(x_val)
         #     print(y_force[i][j])
         rbf.train(x_pos[i],y_force[i])
     print('pass')
-    ori_test = np.array(x_pos[26]).reshape(len(x_pos[26]),1)
+    ori_test = np.array(x_pos[8]).reshape(len(x_pos[8]),1)
     test = rbf.predict(ori_test)
 
     # rbf = RBF(1,12,1)
     # rbf.train(x,y)
     # test = rbf.predict(x)
-    #
-    plt.plot(x_pos[26],y_force[26],'k-',label=u'actual value')
-    plt.plot(x_pos[26],test,'r-',label=u'predict')
+
+    plt.plot(x_pos[8],y_force[8],'k-',label=u'actual value')
+    plt.plot(x_pos[8],test,'r-',label=u'predict')
     plt.ylim(-1,5)
     plt.legend(loc='upper left')
     plt.show()
