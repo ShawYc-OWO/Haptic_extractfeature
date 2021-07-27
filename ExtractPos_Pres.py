@@ -4,8 +4,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import os
 
+
+
 sum_file_pos = []
 sum_file_pres = []
+all_list_time = []
 all_list_pos = []
 all_list_pres = []
 para_pres = 0.00002698211
@@ -19,10 +22,10 @@ y_pos = []
 def cal_size(pressure_array):
     return len(pressure_array)
 
-def read_pos():
-    '''Read all z-axis position data from all Excel files'''
+def read_time():
+    '''Read all time sequence data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
         for file in files:
             if file.endswith(".xlsx"):
                 # Create absolute path
@@ -30,6 +33,28 @@ def read_pos():
                 sum_file_pos.append(file_name)
     file_num = len(sum_file_pos)
     print(file_num)
+    '''Create a parent list for storing following child lists'''
+    for i in range(file_num): # from 0 ~ len(sum_file)-1
+        all_list_time.append([])
+
+    '''Extract position data from each  Excel and store in each corresponding child list'''
+    for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
+        time_step = pd.read_excel(io=file_dir, usecols=[0], names=None)
+        all_list_time[index] = np.array(time_step.values.tolist()).flatten()
+
+    return all_list_time
+
+def read_pos():
+    '''Read all z-axis position data from all Excel files'''
+    for root_dir, sub_dir, files in os.walk(
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+        for file in files:
+            if file.endswith(".xlsx"):
+                # Create absolute path
+                file_name = os.path.join(root_dir, file)
+                sum_file_pos.append(file_name)
+    file_num = len(sum_file_pos)
+    # print(file_num)
 
     '''Create a parent list for storing following child lists'''
     for i in range(file_num): # from 0 ~ len(sum_file)-1
@@ -46,7 +71,7 @@ def read_pos():
 def read_pres():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
         for file in files:
             if file.endswith(".xlsx"):
                 # Create absolute path
@@ -151,11 +176,33 @@ def plot_dataset(file_num,pos,force):
 
 
 if __name__ =='__main__':
+    file_all = []
+    time_series = read_time()
+    time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
+    print('pass')
     pos = read_pos()
     pres_list,file_num = read_pres()
     com_force = comp_force(pres_list,file_num)
-    pos,force = modif(file_num,pos,com_force)
-    plot_dataset(file_num,pos,force)
+    x_co_pos,y_force = modif(file_num,pos,com_force) # Note: the position here is in vertical direction, for plotting, it is the x coordinates
+    print('pass')
+
+    for root_dir, sub_dir, files in os.walk(
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing"):
+        for i in range(file_num):
+            file_name = os.path.join(root_dir, str(i))
+            file_name += str('.xls') # create file path by hand
+            file_all.append(file_name)
+
+    for i in range(file_num):
+        zipped = zip(time_series[i],pos[i][:,0],pos[i][:,2],x_co_pos[i],y_force[i])
+        name = file_all[i]
+        data = pd.DataFrame(zipped)
+        #writer = pd.ExcelWriter(r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\num.xls')  # 写入Excel文件
+        writer = pd.ExcelWriter(name)
+        data.to_excel(writer, 'page_1', float_format='%.5f')  # ‘page_1’是写入excel的sheet名
+
+        writer.save()
+        writer.close()
 
     # pos = pd.read_excel(
     #     io=r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format\testtest_N0 14-06-2021 13-30.xlsx',
