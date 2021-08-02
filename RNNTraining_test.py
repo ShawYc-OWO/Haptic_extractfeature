@@ -15,9 +15,7 @@ import os
 
 import time #helper libraries
 
-# file is downloaded from finance.yahoo.com, 1.1.1997-1.1.2017
-# training data = 1.1.1997 - 1.1.2007
-# test data = 1.1.2007 - 1.1.2017
+
 
 sum_file: List[Any] = []
 df = []
