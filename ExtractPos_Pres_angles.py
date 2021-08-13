@@ -25,7 +25,7 @@ def cal_size(pressure_array):
 def read_time():
     '''Read all time sequence data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
         for file in files:
             if file.endswith(".xlsx"):
                 # Create absolute path
@@ -47,7 +47,7 @@ def read_time():
 def read_pos():
     '''Read all z-axis position data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
         for file in files:
             if file.endswith(".xlsx"):
                 # Create absolute path
@@ -62,16 +62,16 @@ def read_pos():
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
-        pos = pd.read_excel(io=file_dir, usecols=[9, 10, 11], names=None)
+        # pos = pd.read_excel(io=file_dir, usecols=[9, 10, 11], names=None)
+        pos = pd.read_excel(io=file_dir, usecols=[1,2,3,4,5,6,7], names=None)
         all_list_pos[index] = np.array(pos.values.tolist())
 
-    # print(all_list_pos[1])
     return all_list_pos
 
-def read_pres():
+def read_force():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
         for file in files:
             if file.endswith(".xlsx"):
                 # Create absolute path
@@ -80,32 +80,32 @@ def read_pres():
     file_num = len(sum_file_pres)
     '''Create a parent list for storing following child lists'''
     for i in range(file_num):  # from 0 ~ len(sum_file)-1
-        all_list_pres.append([])
+        all_list_force.append([])
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index, file_dir in enumerate(sum_file_pres[0:(file_num)]):
-        pres = pd.read_excel(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
-        tmp_array = np.array(pres.values.tolist())
-        all_list_pres[index] = np.array(np.sum(tmp_array,axis=1))
-    # print((all_list_pres[1]))
+        # pres = pd.read_excel(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
+        force = pd.read_excel(io=file_dir, usecols=[8], names=None)
+        tmp_array = np.array(force.values.tolist())
+        all_list_force[index] = np.array(tmp_array).flatten()
 
-    return all_list_pres, file_num
+    return all_list_force, file_num
 
-def comp_force(pres_array,file_num):
-    '''Compute force from pressure difference'''
-    for i in range(file_num):  # from 0 ~ len(sum_file)-1
-        all_list_diff_force.append([])
-        all_list_force.append([])
-
-    for index in range(file_num):
-        count = 0
-        for j in pres_array[index]:
-            np.array(all_list_diff_force[index].append(j*gra))# storing each time step force from pressure
-            if count >= 1:
-                all_list_force[index].append((all_list_diff_force[index][count]-all_list_diff_force[index][0])) # calculating force from pressure difference
-            count += 1
-
-    return all_list_force
+# def comp_force(pres_array,file_num):
+#     '''Compute force from pressure difference'''
+#     for i in range(file_num):  # from 0 ~ len(sum_file)-1
+#         all_list_diff_force.append([])
+#         all_list_force.append([])
+#
+#     for index in range(file_num):
+#         count = 0
+#         for j in pres_array[index]:
+#             np.array(all_list_diff_force[index].append(j*gra)) # storing each time step force from pressure
+#             if count >= 1:
+#                 all_list_force[index].append((all_list_diff_force[index][count]-all_list_diff_force[index][0])) # calculating force from pressure difference
+#             count += 1
+#
+#     return all_list_force
 
 def indexofMin(tmp_array):
     minindex = 0
@@ -122,16 +122,13 @@ def modif(file_num,pos,force):
         z_force.append([])
 
     for i in range(file_num):
-        count = 0
+        # count = 0
         # minindex = indexofMin(pos[i][:,1])
         # for j in pos[i][:(minindex+1),1]:
-        for j in pos[i][:, 1]:
-            if count >= 1:
-                np.array(y_pos[i].append(abs(j - pos[i][0][1])))
-            count += 1
+        y_pos[i] = pos[i]
         z_force[i] = force[i]
-    # print(len(y_pos[0]))
-    # print(len(z_force[0]))
+    print(len(y_pos[1]))
+    print(len(z_force[1]))
     return y_pos, z_force
 
 def plot_dataset(file_num,pos,force):
@@ -139,68 +136,67 @@ def plot_dataset(file_num,pos,force):
     ax = Axes3D(fig)
     X = np.arange(0,file_num, 1)
 
-    # for i in range(file_num):
-    #     y_pres.append([])
-    #     z_force.append([])
-    #
-    # for i in range(file_num):
-    #     count = 0
-    #     # minindex = indexofMin(pos[i][:,1])
-    #     # for j in pos[i][:(minindex+1),1]:
-    #     for j in pos[i][:,1]:
-    #         if count >= 1:
-    #             np.array(y_pres[i].append(abs(j-pos[i][0][1])))
-    #         count += 1
-    #     z_force[i] = force[i]
-
     # ax = plt.subplot(111,projection='3d')
 
-    # for index in range(5):
-    #     ax.scatter(X[index], y_pres[index], z_force[index])  # 绘制数据点
-    # ax = plt.subplot(111)
     idx = list(range(file_num))
-
-    for index in idx[:]:
-        ax = plt.subplot(5,6,(index+1))
-        ax.plot(pos[index], force[index])  # 绘制数据点
+    for index in idx[:12]:
+        ax = plt.subplot(3, 4, (index + 1))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
+        ax.set_ylabel('force')
+        ax.set_xlabel('depth')
+    plt.show()
+    for index in idx[36:47]:
+        ax = plt.subplot(3, 4, (index -35))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
+        ax.set_ylabel('force')
+        ax.set_xlabel('depth')
+    plt.show()
+    for index in idx[47:59]:
+        ax = plt.subplot(3,4, (index-46))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
+        ax.set_ylabel('force')
+        ax.set_xlabel('depth')
+    plt.show()
+    for index in idx[59:71]:
+        ax = plt.subplot(3, 4, (index - 58))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
+        ax.set_ylabel('force')
+        ax.set_xlabel('depth')
+    plt.show()
+    for index in idx[71:82]:
+        ax = plt.subplot(3, 4, (index - 70))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
+        ax.set_ylabel('force')
+        ax.set_xlabel('depth')
+    plt.show()
+    for index in idx[82:94]:
+        ax = plt.subplot(3, 4, (index - 81))
+        ax.scatter(pos[index], force[index])  # 绘制数据点
         ax.set_ylabel('force')
         ax.set_xlabel('depth')
     plt.show()
 
-    # ax.set_zlabel('force')  # 坐标轴
-    # ax.set_ylabel('depth')
-    # ax.set_xlabel('testcase_No')
-
-    # plt.xlim((0,31))
-    # my_x_ticks = np.arange(0, 31, 1)
-    # plt.xticks(my_x_ticks)
-    # ax.plot_surface(X, y_pres, z_force, rstride=1, cstride=1, cmap='rainbow')
-    # plt.show()
-
-
 
 if __name__ =='__main__':
     file_all = []
-    # time_series = read_time()
-    # time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
+    time_series = read_time()
+    time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
     print('pass')
     pos = read_pos()
-    pres_list,file_num = read_pres()
-    com_force = comp_force(pres_list,file_num)
-    x_co_pos,y_force = modif(file_num,pos,com_force) # Note: the position here is in vertical direction, for plotting, it is the x coordinates
-    plot_dataset(file_num,x_co_pos,y_force)
-    exit()
-    print('pass')
+    force_list,file_num = read_force()
+    # com_force = comp_force(force,file_num)
+    # x_co_pos,y_force = modif(file_num,pos,force_list) # Note: the position here is in vertical direction, for plotting, it is the x coordinates
+    # plot_dataset(file_num,x_co_pos,y_force)
 
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Random"):
         for i in range(file_num):
             file_name = os.path.join(root_dir, str(i))
             file_name += str('.xls') # create file path by hand
             file_all.append(file_name)
 
     for i in range(file_num):
-        zipped = zip(time_series[i],pos[i][:,0],pos[i][:,2],x_co_pos[i],y_force[i])
+        zipped = zip(time_series[i],pos[i][:,3],pos[i][:,4],pos[i][:,5],pos[i][:,6],pos[i][:,0],pos[i][:,2],pos[i][:,1],force_list[i])
         name = file_all[i]
         data = pd.DataFrame(zipped)
         #writer = pd.ExcelWriter(r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\num.xls')  # 写入Excel文件
@@ -209,16 +205,3 @@ if __name__ =='__main__':
 
         writer.save()
         writer.close()
-
-    # pos = pd.read_excel(
-    #     io=r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format\testtest_N0 14-06-2021 13-30.xlsx',
-    #     usecols=[9, 10, 11], names=None)
-    # pos_li1 = np.array(pos.values.tolist())
-    # pres = pd.read_excel(
-    #     io=r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project\Third Term\Test data\test_in_1cm_circle\In excel format\testtest_N0 14-06-2021 13-30.xlsx',
-    #     usecols=[i for i in range(24, 2313)])
-    # pres_li1 = np.array(pres.values.tolist())
-    # sum_pres = np.sum(pres_li1,axis=1)  # compute each time step pressure (every row with 2288 data points on pressure map)
-
-    # print(sum_pres)
-    # print(cal_size(sum_pres))

@@ -29,7 +29,7 @@ data_test_x = []
 
 def read_name():
     '''Read each file name from all Excel files for following work'''
-    for root_dir, sub_dir, files in os.walk(r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing"):
+    for root_dir, sub_dir, files in os.walk(r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Random"):
         # count = 0
         for file in files:
             if file.endswith(".xls"):
@@ -70,9 +70,9 @@ if __name__ =='__main__':
         '''For building training dataset'''
         for idx, name in enumerate(file_name):
 
-            df[idx] = pd.read_excel(name, header=None, usecols=[1, 2, 3, 4, 5], names=None)
-            tmp_data_y = df[idx].values[1:,4]
-            tmp_data_x = (df[idx].values)[1:,0:4] # 含每次实验的time-step feature的
+            df[idx] = pd.read_excel(name, header=None, usecols=[2, 3, 4, 5, 6, 7, 8,9], names=None)
+            tmp_data_y = df[idx].values[1:,7]
+            tmp_data_x = (df[idx].values)[1:,0:7] # 含每次实验的time-step feature的
             # tmp_data_x = (df[idx].values)[1:,1:4]# 不含每次实验的time-step feature的
             # tmp_data_x = (df[idx].values)[1:, [0,3]] # 只含每次实验 timestep, 以及palpation depth
             data.append(np.array(tmp_data_y[:]))
@@ -82,17 +82,17 @@ if __name__ =='__main__':
         tmp_x = []
 
         '''For building test dataset'''
-        # print(file_name[26])
-        df_test = pd.read_excel(file_name[28], header=None, usecols=[1, 2, 3, 4, 5], names=None)
-        tmp_y = (df_test.values)[1:,4]
-        # tmp_x = (df_test.values)[1:,0:4]
-        # tmp_data_x = (df_test.values)[1:, 1:4]  # 不含每次实验的time-step feature的
-        tmp_data_x = (df_test.values)[1:,[0,3]] # 只含每次实验timestep, 以及palpation depth
-        data_test.append(np.array(tmp_y[:]))
-        data_test_x.append(np.array(tmp_x[:]))
-        # print(tmp_data_y)
-        # print(tmp_data_x)
-        # plt.plot(tmp_data_x[:,3],tmp_data_y)
+        # # print(file_name[26])
+        # df_test = pd.read_excel(file_name[0], header=None, usecols=[1, 2, 3, 4, 5], names=None)
+        # tmp_y = (df_test.values)[1:,4]
+        # # tmp_x = (df_test.values)[1:,0:4]
+        # # tmp_data_x = (df_test.values)[1:, 1:4]  # 不含每次实验的time-step feature的
+        # tmp_data_x = (df_test.values)[1:,[0,3]] # 只含每次实验timestep, 以及palpation depth
+        # data_test.append(np.array(tmp_y[:]))
+        # data_test_x.append(np.array(tmp_x[:]))
+        # # print(tmp_data_y)
+        # # print(tmp_data_x)
+        # # plt.plot(tmp_data_x[:,3],tmp_data_y)
 
 
         # take close price column[5]
@@ -107,22 +107,21 @@ if __name__ =='__main__':
         #all_y = df[5].values
         dataset = all_y.reshape(-1, 1)
         dataset_test =all_test_y.reshape(-1,1)
-        if all_x.shape[1] == 4:
-            dataset_x = all_x.reshape(-1,4)
-            dataset_test_x = all_test_x.reshape(-1,4)
+        if all_x.shape[1] == 7:
+            dataset_x = all_x.reshape(-1,7)
+            # dataset_test_x = all_test_x.reshape(-1,4)
         elif all_x.shape[1] == 3:
             dataset_x = all_x.reshape(-1, 3)
-            dataset_test_x = all_test_x.reshape(-1,3)
+            # dataset_test_x = all_test_x.reshape(-1,3)
         elif all_x.shape[1] == 2:
             dataset_x = all_x.reshape(-1, 2)
-            dataset_test_x = all_test_x.reshape(-1, 2)
+            # dataset_test_x = all_test_x.reshape(-1, 2)
 
         # normalize the dataset
         scaler = MinMaxScaler(feature_range=(0, 1))
         dataset = scaler.fit_transform(dataset)
         # dataset_test = scaler.fit_transform(dataset_test)
         # split into train and test sets, 50% test data, 5
-        # 0% training data, for one palpation test, choose a single back and forth process
         train_size = int(len(dataset) * 0.50)
         fulllength = list(range(len(dataset)))
         train_idx = random.sample(fulllength,train_size) # for ensuring the training points non-repetitive
@@ -131,7 +130,7 @@ if __name__ =='__main__':
         for i in fulllength:
             if i not in train_idx:
                 test_idx.append(i)
-        # print(len(test_idx))
+
 
         # test_size = len(dataset) - train_size
         train_y, test_y = dataset[train_idx, :], dataset[test_idx,:]
@@ -159,8 +158,8 @@ if __name__ =='__main__':
         '''create and fit the LSTM network, optimizer=adam'''
         train_epoch = 1500
         model = Sequential()
-        if all_x.shape[1] == 4:
-            model.add(LSTM(100, input_shape=(1,4))) # 以及输入维度是time, x,y coordinates and depth,四维
+        if all_x.shape[1] == 7:
+            model.add(LSTM(121, input_shape=(1,7))) # 以及输入维度是time, x,y coordinates and depth,四维
             model.add(Dropout(0.05))
         elif all_x.shape[1] == 3:
             model.add(LSTM(88, input_shape=(1,3))) # 以及输入维度是 x,y coordinates and depth，三维
@@ -174,7 +173,7 @@ if __name__ =='__main__':
             batch = 150
         else:
             batch = 300
-        if all_x.shape[1] == 4:
+        if all_x.shape[1] == 7:
             model.fit(trainX, trainY, epochs=train_epoch, batch_size=150, verbose=1) # 需要修改batchsize
         else:
             model.fit(trainX,trainY,epochs=train_epoch, batch_size=150, verbose=1) # 需要修改batchsize
@@ -188,10 +187,7 @@ if __name__ =='__main__':
         # invert predictions
         trainPredict = scaler.inverse_transform(trainPredict)
         trainY = scaler.inverse_transform([trainY.flatten()])
-        if len(testY) >= 80:
-            testPredict = scaler.inverse_transform(testPredict)
-        else:
-            testPredict = scaler.inverse_transform(testPredict)
+        testPredict = scaler.inverse_transform(testPredict)
         testY = scaler.inverse_transform([testY.flatten()])
         # print(trainPredict)
         # print(testPredict)
@@ -232,10 +228,10 @@ if __name__ =='__main__':
         plt.figure(2)
         time_step = np.array(list(range(len(testX)))).reshape(-1,1)
         # ax = plt.subplot(111, projection='3d')
-        if all_x.shape[1] == 4:
+        if all_x.shape[1] == 7:
             a = np.array([i for i in testX[:, :, 3].reshape(-1,1)])
         elif all_x.shape[1] == 3:
-            a = np.array([i for i in testX[:,:,2].reshape(-1,1)])
+            a = np.array([i for i in testX[:, :, 2].reshape(-1,1)])
         b = np.array([i for i in testY.reshape(-1, 1)])
         c = np.array([i for i in time_step])
         d = np.array([i for i in testPredict.reshape(-1, 1)])
@@ -245,7 +241,7 @@ if __name__ =='__main__':
         # print(d)
         # print('Palpation depth')
         # print(a)
-        if all_x.shape[1] == 4:
+        if all_x.shape[1] == 7:
             # base_curve, = plt.plot(dataset_test_x[:,3],scaler.inverse_transform(dataset_test[:]))
             base_curve, =plt.plot(c,b)
             # base_curve = ax.scatter3D(c,b,a)
@@ -274,4 +270,4 @@ if __name__ =='__main__':
 
         # plot the actual price, prediction in test data=red line, actual price=blue line
 
-    print(RMSE_record)
+    # print(RMSE_record)
