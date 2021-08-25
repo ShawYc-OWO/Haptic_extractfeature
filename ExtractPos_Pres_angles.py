@@ -25,9 +25,9 @@ def cal_size(pressure_array):
 def read_time():
     '''Read all time sequence data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\tumor_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pos.append(file_name)
@@ -39,7 +39,8 @@ def read_time():
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
-        time_step = pd.read_excel(io=file_dir, usecols=[0], names=None)
+        # time_step = pd.read_excel(io=file_dir, usecols=[0], names=None)
+        time_step = pd.read_csv(file_dir, usecols=[0], names=None)
         all_list_time[index] = np.array(time_step.values.tolist()).flatten()
 
     return all_list_time
@@ -47,9 +48,9 @@ def read_time():
 def read_pos():
     '''Read all z-axis position data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\tumor_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pos.append(file_name)
@@ -63,7 +64,7 @@ def read_pos():
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
         # pos = pd.read_excel(io=file_dir, usecols=[9, 10, 11], names=None)
-        pos = pd.read_excel(io=file_dir, usecols=[1,2,3,4,5,6,7], names=None)
+        pos = pd.read_csv(file_dir, usecols=[1,2,3,4,5,6,7], names=None)
         all_list_pos[index] = np.array(pos.values.tolist())
 
     return all_list_pos
@@ -71,9 +72,9 @@ def read_pos():
 def read_force():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Randoms_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pres.append(file_name)
@@ -85,7 +86,7 @@ def read_force():
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index, file_dir in enumerate(sum_file_pres[0:(file_num)]):
         # pres = pd.read_excel(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
-        force = pd.read_excel(io=file_dir, usecols=[8], names=None)
+        force = pd.read_csv(file_dir, usecols=[8], names=None)
         tmp_array = np.array(force.values.tolist())
         all_list_force[index] = np.array(tmp_array).flatten()
 
@@ -184,12 +185,14 @@ if __name__ =='__main__':
     print('pass')
     pos = read_pos()
     force_list,file_num = read_force()
+    print('pass')
+
     # com_force = comp_force(force,file_num)
     # x_co_pos,y_force = modif(file_num,pos,force_list) # Note: the position here is in vertical direction, for plotting, it is the x coordinates
     # plot_dataset(file_num,x_co_pos,y_force)
 
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Random"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Tumor"):
         for i in range(file_num):
             file_name = os.path.join(root_dir, str(i))
             file_name += str('.xls') # create file path by hand

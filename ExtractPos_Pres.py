@@ -25,9 +25,9 @@ def cal_size(pressure_array):
 def read_time():
     '''Read all time sequence data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pos.append(file_name)
@@ -39,7 +39,8 @@ def read_time():
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
-        time_step = pd.read_excel(io=file_dir, usecols=[0], names=None)
+        # time_step = pd.read_csv(io=file_dir, usecols=[0], names=None)
+        time_step = pd.read_csv(file_dir, usecols=[0], names=None)
         all_list_time[index] = np.array(time_step.values.tolist()).flatten()
 
     return all_list_time
@@ -47,9 +48,9 @@ def read_time():
 def read_pos():
     '''Read all z-axis position data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pos.append(file_name)
@@ -62,7 +63,8 @@ def read_pos():
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
-        pos = pd.read_excel(io=file_dir, usecols=[9, 10, 11], names=None)
+        # pos = pd.read_csv(io=file_dir, usecols=[9, 10, 11], names=None)
+        pos = pd.read_csv(file_dir, usecols=[9, 10, 11], names=None)
         all_list_pos[index] = np.array(pos.values.tolist())
 
     # print(all_list_pos[1])
@@ -71,9 +73,9 @@ def read_pos():
 def read_pres():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_In excel format"):
         for file in files:
-            if file.endswith(".xlsx"):
+            if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pres.append(file_name)
@@ -84,7 +86,8 @@ def read_pres():
 
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index, file_dir in enumerate(sum_file_pres[0:(file_num)]):
-        pres = pd.read_excel(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
+        # pres = pd.read_csv(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
+        pres = pd.read_csv(file_dir, usecols=[i for i in range(24, 2313)], names=None)
         tmp_array = np.array(pres.values.tolist())
         all_list_pres[index] = np.array(np.sum(tmp_array,axis=1))
     # print((all_list_pres[1]))
@@ -181,8 +184,8 @@ def plot_dataset(file_num,pos,force):
 
 if __name__ =='__main__':
     file_all = []
-    # time_series = read_time()
-    # time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
+    time_series = read_time()
+    time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
     print('pass')
     pos = read_pos()
     pres_list,file_num = read_pres()
