@@ -47,7 +47,7 @@ def read_test_name():
     '''Read each file name from test Excel files for following work'''
     for root_dir, sub_dir, files in os.walk(
             r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Tumor"
-            r"\Test"):
+            r"\Normal_test"):
         for file in files:
             if file.endswith(".xls"):
                 # Create absolute path
@@ -186,9 +186,9 @@ if __name__ =='__main__':
         model.add(Dense(1)) # Dense = 1
         model.compile(loss='mse', optimizer='adam')
         if time == 1:
-            batch = 15
+            batch = 150
         else:
-            batch = 30
+            batch = 300
         model.fit(trainX,trainY,epochs=train_epoch, batch_size=150, verbose=1) # 需要修改batchsize
 
 
@@ -231,7 +231,7 @@ if __name__ =='__main__':
         # train_predict_curve, = plt.plot(dataset_x[0:train_size,3],trainPredict)
         train_predict_curve, = plt.plot(trainPredict)
         # plt.xlabel('Time step')
-        plt.xlabel('Time step')
+        plt.xlabel('Sample Number')
         plt.ylabel('Force')
         plt.legend([base_curve,train_predict_curve],['Basecurve','Prediction'])
         # print('trainForce:')
@@ -266,7 +266,7 @@ if __name__ =='__main__':
         # ax.set_zlabel('Palpation depth')
         # ax.set_ylabel('Force')
         # plt.xlabel('Palpation depth')
-        plt.xlabel('Time step')
+        plt.xlabel('Sample Number')
         plt.ylabel('Force')
         # ax.set_xlim(0,len(a)+10)
         plt.legend([base_curve,test_predict_curve],['Experimental Measurement','Prediction'])

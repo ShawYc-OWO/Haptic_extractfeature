@@ -22,15 +22,17 @@ y_pos = []
 def cal_size(pressure_array):
     return len(pressure_array)
 
-def read_time():
+def read_name():
     '''Read all time sequence data from all Excel files'''
+    name_collection = []
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\tumor_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
                 file_name = os.path.join(root_dir, file)
                 sum_file_pos.append(file_name)
+                name_collection.append(file)
     file_num = len(sum_file_pos)
     print(file_num)
     '''Create a parent list for storing following child lists'''
@@ -43,12 +45,12 @@ def read_time():
         time_step = pd.read_csv(file_dir, usecols=[0], names=None)
         all_list_time[index] = np.array(time_step.values.tolist()).flatten()
 
-    return all_list_time
+    return all_list_time, name_collection
 
 def read_pos():
     '''Read all z-axis position data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\tumor_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
@@ -72,7 +74,7 @@ def read_pos():
 def read_force():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_In excel format"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
@@ -180,7 +182,8 @@ def plot_dataset(file_num,pos,force):
 
 if __name__ =='__main__':
     file_all = []
-    time_series = read_time()
+    name_collection = []
+    time_series, name_collection = read_name()
     time_series = [[round(j,2) for j in time_series[i]] for i in range(len(time_series))]
     print('pass')
     pos = read_pos()
@@ -192,14 +195,14 @@ if __name__ =='__main__':
     # plot_dataset(file_num,x_co_pos,y_force)
 
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Tumor"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Angle with path\Test"):
         for i in range(file_num):
-            file_name = os.path.join(root_dir, str(i))
-            file_name += str('.xls') # create file path by hand
+            file_name = os.path.join(root_dir, str(name_collection[i]))
+            file_name += str('.xls') # create new file path
             file_all.append(file_name)
 
     for i in range(file_num):
-        zipped = zip(time_series[i],pos[i][:,3],pos[i][:,4],pos[i][:,5],pos[i][:,6],pos[i][:,0],pos[i][:,2],pos[i][:,1],force_list[i])
+        zipped = zip(time_series[i],pos[i][:,3],pos[i][:,4],pos[i][:,5],pos[i][:,6],pos[i][:,0],pos[i][:,2],pos[i][:,1],force_list[i]) # storing information for training and testing
         name = file_all[i]
         data = pd.DataFrame(zipped)
         #writer = pd.ExcelWriter(r'D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\num.xls')  # 写入Excel文件
