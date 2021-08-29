@@ -26,7 +26,7 @@ def read_name():
     '''Read all time sequence data from all Excel files'''
     name_collection = []
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
@@ -42,15 +42,16 @@ def read_name():
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
         # time_step = pd.read_excel(io=file_dir, usecols=[0], names=None)
-        time_step = pd.read_csv(file_dir, usecols=[0], names=None)
+        time_step = pd.read_csv(file_dir, usecols=[0], skiprows=lambda x: x % 8 != 0, names=None)
         all_list_time[index] = np.array(time_step.values.tolist()).flatten()
+
 
     return all_list_time, name_collection
 
 def read_pos():
     '''Read all z-axis position data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
@@ -66,7 +67,7 @@ def read_pos():
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index,file_dir in enumerate(sum_file_pos[0:(file_num)]):
         # pos = pd.read_excel(io=file_dir, usecols=[9, 10, 11], names=None)
-        pos = pd.read_csv(file_dir, usecols=[1,2,3,4,5,6,7], names=None)
+        pos = pd.read_csv(file_dir, usecols=[1,2,3,4,5,6,7], skiprows=lambda x: x % 8 != 0, names=None)
         all_list_pos[index] = np.array(pos.values.tolist())
 
     return all_list_pos
@@ -74,7 +75,7 @@ def read_pos():
 def read_force():
     '''Read each time step pressure data from all Excel files'''
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\path_Test"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\updown mov_Test"):
         for file in files:
             if file.endswith(".csv"):
                 # Create absolute path
@@ -88,7 +89,7 @@ def read_force():
     '''Extract position data from each  Excel and store in each corresponding child list'''
     for index, file_dir in enumerate(sum_file_pres[0:(file_num)]):
         # pres = pd.read_excel(io=file_dir, usecols=[i for i in range(24,2313)], names=None)
-        force = pd.read_csv(file_dir, usecols=[8], names=None)
+        force = pd.read_csv(file_dir, usecols=[8], skiprows=lambda x: x % 8 != 0, names=None)
         tmp_array = np.array(force.values.tolist())
         all_list_force[index] = np.array(tmp_array).flatten()
 
@@ -195,13 +196,14 @@ if __name__ =='__main__':
     # plot_dataset(file_num,x_co_pos,y_force)
 
     for root_dir, sub_dir, files in os.walk(
-            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Angle with path\Test"):
+            r"D:\机器人与计算机类的渐进学习\2020-2021 IC专业机器人学习\Project_DataDrivenHaptic\Third Term\Test data\test_in_1cm_circle\Prepocessing\Pushing\Test"):
         for i in range(file_num):
             file_name = os.path.join(root_dir, str(name_collection[i]))
             file_name += str('.xls') # create new file path
             file_all.append(file_name)
 
     for i in range(file_num):
+
         zipped = zip(time_series[i],pos[i][:,3],pos[i][:,4],pos[i][:,5],pos[i][:,6],pos[i][:,0],pos[i][:,2],pos[i][:,1],force_list[i]) # storing information for training and testing
         name = file_all[i]
         data = pd.DataFrame(zipped)
